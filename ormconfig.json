@@ -1,0 +1,14 @@
+{
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "postgres",
+    "password": "BubaBuba",
+    "database": "outside_digital_test_tasks_db",
+    "entities": ["dist/**/*.entity{.ts,.js}"],
+    "synchronize": true,
+    "migrations": ["migration/*.js"],
+    "cli": {
+        "migrationsDir": "migration"
+    }
+}
