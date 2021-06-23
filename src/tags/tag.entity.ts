@@ -7,7 +7,7 @@ export class Tag {
   id: number;
 
   @ManyToOne(() => User, (user) => user.tags)
-  user: User;
+  creator: User;
 
   @Column({ type: 'varchar', length: 40 })
   name: string;

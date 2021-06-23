@@ -1,12 +1,17 @@
-import { Min } from 'class-validator';
-import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { MinLength } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
+import { ContainsNumeric } from 'src/common/validators/contains-numeric';
+import { ContainsLowercaseLetter } from 'src/common/validators/contains-lowercase-letter';
+import { ContainsUppercaseLetter } from 'src/common/validators/contains-uppercase-letter';
 
 export class CreateUserDto {
   @IsNotEmpty()
   email: string;
 
-  @IsNotEmpty()
-  @Min(8)
+  @MinLength(8)
+  @ContainsUppercaseLetter()
+  @ContainsLowercaseLetter()
+  @ContainsNumeric()
   password: string;
 
   @IsNotEmpty()

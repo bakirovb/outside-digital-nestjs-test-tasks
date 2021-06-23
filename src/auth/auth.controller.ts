@@ -1,38 +1,66 @@
-import {
-  Body,
-  Controller,
-  Post,
-  UseGuards,
-  Request,
-  Get,
-} from '@nestjs/common';
+import { Response } from 'express';
+import { Body, Controller, Post, UseGuards, Req, Res } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
+import { NestFactory } from '@nestjs/core';
+import RequestWithUser from './interfaces/request-with-user.interface';
 
-@Controller()
+@Controller('auth')
 export class AuthController {
-  constructor(
-    private usersService: UsersService,
-    private authService: AuthService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
-  @Post('/signin')
-  async create(@Body() createUserDto: CreateUserDto) {
-    return this.authService.create(createUserDto);
+  @Post('signin')
+  async register(
+    @Body() createUserDto: CreateUserDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const res = await this.authService.register(createUserDto);
+    response.cookie('refreshToken', res.refreshToken.token, {
+      httpOnly: true,
+      maxAge: res.refreshToken.expiresIn,
+      path: '/auth',
+    });
+    return {
+      token: res.accessToken.token,
+      expire: res.accessToken.expiresIn,
+    };
   }
 
   @UseGuards(LocalAuthGuard)
-  @Post('/login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  @Post('login')
+  async logIn(
+    @Res({ passthrough: true }) response: Response,
+    @Req() request: RequestWithUser,
+  ) {
+    const res = await this.authService.logIn(request.user);
+    response.cookie('refreshToken', res.refreshToken.token, {
+      httpOnly: true,
+      maxAge: res.refreshToken.expiresIn,
+      path: '/auth',
+    });
+    return {
+      token: res.accessToken.token,
+      expire: res.accessToken.expiresIn,
+    };
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('/user')
-  async getProfile(@Request() req) {
-    return req.user;
+  @Post('refresh-tokens')
+  async refresh(
+    @Req() request: RequestWithUser,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const tokens = await this.authService.refreshTokens(
+      request.cookies['refreshToken'],
+    );
+    response.cookie('refreshToken', tokens.refreshToken.token, {
+      httpOnly: true,
+      maxAge: tokens.refreshToken.expiresIn,
+      path: '/auth',
+    });
+    return {
+      token: tokens.accessToken.token,
+      expire: tokens.accessToken.expiresIn,
+    };
   }
 }

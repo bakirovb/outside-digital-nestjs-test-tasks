@@ -1,28 +1,32 @@
 import {
-  //   Body,
+  Body,
   Controller,
-  //   Get,
-  //   Post,
-  //   Request,
-  //   UseGuards,
+  Get,
+  Post,
+  Put,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-// import { LocalAuthGuard } from 'src/auth/local-auth.guard';
-// import { CreateUserDto } from './dto/create-user.tdo';
-// import { UsersService } from './users.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserRelations } from './interfaces/find-user-options.interface';
+import { UsersService } from './users.service';
 
-@Controller('users')
+@UseGuards(JwtAuthGuard)
+@Controller()
 export class UsersController {
-  // constructor(
-  //   private authService: AuthService,
-  //   private usersService: UsersService,
-  // ) {}
-  // @UseGuards(LocalAuthGuard)
-  // @Post('/signin')
-  // async create(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.create(createUserDto);
-  // }
-  // @Post('/login')
-  // async login(@Request() req) {
-  //   return this.authService.login(req.user);
-  // }
+  constructor(private usersService: UsersService) {}
+
+  @Get('/user')
+  async getProfile(@Request() req) {
+    const user = await this.usersService.findById(req.user.uid, {
+      relations: [UserRelations.Tags],
+    });
+    return { email: user.email, nickname: user.nickname, tags: user.tags };
+  }
+
+  @Put('/user')
+  async editProfile(@Request() req) {
+    const user = await this.usersService.edit(req.user.uid, req.body);
+    return { email: user.email, nickname: user.nickname };
+  }
 }

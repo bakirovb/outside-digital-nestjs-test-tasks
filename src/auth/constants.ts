@@ -1,4 +1,12 @@
 export const jwtConstants = {
   secret: 'secretKey',
-  expire: 60,
+  expiresIn: 1800,
+};
+
+export const refreshSessionConstants = {
+  userSessionCount: 5,
+};
+
+export const bcryptConstants = {
+  saltRounds: 10,
 };
