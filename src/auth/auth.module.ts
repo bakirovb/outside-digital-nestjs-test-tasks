@@ -13,7 +13,7 @@ import { RefreshSessionService } from './refresh-session.service';
 
 @Module({
   imports: [
-    UsersModule,
+    forwardRef(() => UsersModule),
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
@@ -23,5 +23,6 @@ import { RefreshSessionService } from './refresh-session.service';
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, RefreshSessionService],
   controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}

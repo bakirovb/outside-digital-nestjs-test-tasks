@@ -3,5 +3,6 @@ export interface FindUserOptions {
 }
 
 export enum UserRelations {
+  CreatedTags = 'createdTags',
   Tags = 'tags',
 }

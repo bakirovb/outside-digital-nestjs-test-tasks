@@ -1,8 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { UsersService } from '../users/users.service';
-import { bcryptConstants, jwtConstants } from './constants';
+import {
+  bcryptConstants,
+  jwtConstants,
+  refreshSessionConstants,
+} from './constants';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UserDto } from 'src/users/dto/user.dto';
 import { JwtPayload } from './interfaces/payload.interface';
@@ -14,18 +24,22 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(
     private jwtService: JwtService,
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     private refreshSessionService: RefreshSessionService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<UserDto> {
-    const user = await this.usersService.findByEmail(email);
-    const match = await bcrypt.compare(pass, user.password);
-    if (match) {
-      const { password, ...result } = user;
-      return result;
+    const user = await this.usersService.getByEmail(email);
+    if (!user) {
+      return null;
     }
-    return null;
+    const match = await bcrypt.compare(pass, user.password);
+    if (!match) {
+      return null;
+    }
+    const { password, ...result } = user;
+    return result;
   }
 
   async register(createUserDto: CreateUserDto): Promise<LoginStatus> {
@@ -49,8 +63,16 @@ export class AuthService {
     return this.createTokens(payload);
   }
 
+  async logOut(refreshToken: string) {
+    await this.refreshSessionService.deleteByRefreshToken(refreshToken);
+  }
+
+  async abortAllUserSessions(userId: string) {
+    await this.refreshSessionService.deleteAllUserSessions(userId);
+  }
+
   async refreshTokens(refreshToken: string) {
-    const refreshSession = await this.refreshSessionService.checkRefreshSession(
+    const refreshSession = await this.refreshSessionService.checkRelevance(
       refreshToken,
     );
     const user = refreshSession.user;
@@ -62,10 +84,13 @@ export class AuthService {
     return this.createTokens(payload);
   }
 
-  async createTokens(payload) {
-    const refreshSession = await this.refreshSessionService.create(
-      payload.sub,
-      jwtConstants.expiresIn,
+  async createTokens(payload: JwtPayload) {
+    const refreshSessionData = {
+      user: payload.sub,
+      expiresIn: refreshSessionConstants.expiresIn,
+    };
+    const createdRefreshSession = await this.refreshSessionService.create(
+      refreshSessionData,
     );
     const accessToken = this.jwtService.sign(payload);
     return {
@@ -74,15 +99,19 @@ export class AuthService {
         expiresIn: jwtConstants.expiresIn,
       },
       refreshToken: {
-        token: refreshSession.refreshToken,
-        expiresIn: refreshSession.expiresIn,
+        token: createdRefreshSession.refreshToken,
+        expiresIn: createdRefreshSession.expiresIn,
       },
     };
   }
 
   async getUser(payload: JwtPayload): Promise<UserDto> {
-    const user = await this.usersService.findById(payload.sub);
+    const user = await this.usersService.getById(payload.sub);
     const { password, ...result } = user;
     return result;
+  }
+
+  getCookiesForLogOut() {
+    return ['refreshToken=; HttpOnly; Path=/; Max-Age=0'];
   }
 }

@@ -1,9 +1,8 @@
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { Body, Controller, Post, UseGuards, Req, Res } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
-import { NestFactory } from '@nestjs/core';
 import RequestWithUser from './interfaces/request-with-user.interface';
 
 @Controller('auth')
@@ -62,5 +61,14 @@ export class AuthController {
       token: tokens.accessToken.token,
       expire: tokens.accessToken.expiresIn,
     };
+  }
+
+  @Post('logout')
+  async logOut(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    await this.authService.logOut(request['refreshToken']);
+    response.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
   }
 }

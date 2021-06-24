@@ -1,6 +1,13 @@
 import { RefreshSession } from 'src/auth/refresh-session.entity';
 import { Tag } from 'src/tags/tag.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -17,8 +24,12 @@ export class User {
   nickname: string;
 
   @OneToMany(() => Tag, (tag) => tag.creator)
-  tags: Tag[];
+  createdTags: Tag[];
 
   @OneToMany(() => RefreshSession, (refreshSession) => refreshSession.user)
   refreshSessions: RefreshSession[];
+
+  @ManyToMany(() => Tag)
+  @JoinTable()
+  tags: Tag[];
 }

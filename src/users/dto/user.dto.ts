@@ -16,9 +16,15 @@ export class UserDto {
   @IsNotEmpty()
   password?: string;
 
+  createdTags?: Tag[];
+
   @Allow()
   tags?: Tag[];
 
   @Allow()
   refreshSessions?: RefreshSession[];
+
+  constructor(partial: Partial<UserDto>) {
+    Object.assign(this, partial);
+  }
 }
