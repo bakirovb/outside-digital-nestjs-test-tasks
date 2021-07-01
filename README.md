@@ -1,73 +1,404 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# Тестовое задание на основе требований, которые описаны ниже
+*Чтобы запустить проекта на своем ПК можно использовать docker. Для этого нужно клонировать git репозиторий и вызвать команду docker-compose up*
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Заметки
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Требования
 
-## Description
+### Стек:
+DB: PostgresSQL
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Framework: express, nestJS __Зависит от описания в вакансии и вашего опыта__
 
-## Installation
+### Описание
 
-```bash
-$ npm install
+Реализовать CRUD для сущностей User и Tags.
+
+**User:**
+
+| field         | type        |
+| ------------- |:-----------:|
+| uid           | uuid        |
+| email         | string(100) |
+| password      | string(100) | 
+| nickname      | string(30)  |
+
+**password**: должен содержать как минимум одну цифру, одну заглавную и одну строчную буквы.
+
+**password**: минимальная длинна 8 символов
+
+**Tag**
+
+| field         | type           |
+| ------------- |:--------------:|
+| id            | int            |
+| creator       | uuid           |
+| name          | string(40)     |
+| sortOrder     | int default(0) |
+
+**creator** uid пользователя создавшего тэг, только он может его менять и удалять из базы
+
+**UserTag**
+
+Эту таблицу нужно сделать самим
+
+-----
+
+Сделать сервис с REST API и авторизациею по JWT bearer token.
+
+Настроить CORS для доступа с любого origin.
+
+### Обязательные требования
+
+1) Пароли не хранить в открытом виде
+2) Реализовать валидацию полей на api запросы с кодами ответов и сообщениями об ошибке в теле ответа.
+3) Развернуть проект в любом удобном месте, что бы можно было прогнать тесты и проверить.
+4) Код на github или gitlab
+5) Придерживаться принципам SOLID
+6) Токен авторизации живет 30 минут
+7) Реализовать endpoint для обновления токена
+8) Создать миграции
+9) Написать сопроводительную документация в README.md для разворота
+10) Реализовать offset или пагинацию для сущности **TAG**
+11) Реализовать Сортировку по полю **sortOrder** и(или) полю **name** для сущности **TAG**
+
+### Дополнительные требования
+
+1) Использовать DTO
+2) Писать интерфейсы и реализовывать их
+3) Желательно не использовать ORM
+4) Написать DockerFile для приложения
+5) Написать docker-composer для локального разворота приложения
+6) Реализовать кеширование
+7) Покрыть тестами сами api
+8) Добавить генерацию swagger документации для api методов (или написать ручками и положит в проект в директорию /doc)
+
+### Список API endpoint
+
+- POST /signin
+
+```json
+{
+  "email": "example@exe.com",
+  "password": "example",
+  "nickname": "nickname"
+}
 ```
 
-## Running the app
+Валидировать **password**, **email**, **nickname**
 
-```bash
-# development
-$ npm run start
+RETURN:
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```json
+{
+  "token": "token",
+  "expire": "1800"
+}
 ```
 
-## Test
+---
+- POST /login
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```json
+{
+  "email": "example@exe.com",
+  "password": "example"
+}
 ```
 
-## Support
+RETURN:
+```json
+{
+  "token": "token",
+  "expire": "1800"
+}
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
+- POST /logout
+  
+  HEADER: ```Authorization: Bearer {token}```
 
-## Stay in touch
+**Ниже идущие api закрыты под авторизацией**
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
+- GET /user
 
-## License
+  HEADER: ```Authorization: Bearer {token}```
 
-Nest is [MIT licensed](LICENSE).
+RETURN:
+```json
+{
+  "email": "example@exe.com",
+  "nickname": "example",
+  "tags": [
+    {
+      "id": "id",
+      "name": "example",
+      "sortOrder": "0"
+    }
+  ]
+}
+```
+
+---
+- PUT /user
+  
+  HEADER: ```Authorization: Bearer {token}```
+
+```json
+{
+  "email": "example@exe.com",
+  "password": "example",
+  "nickname": "example"
+}
+```
+
+Все поля опциональные
+
+Валидировать **password**, **email**, **nickname**
+
+Проверять на дублирование __email__ и __nickname__ в базе
+
+RETURN :
+
+```json
+{
+  "email": "example@exe.com",
+  "nickname": "example"
+}
+```
+
+---
+- DELETE /user
+
+  HEADER: ```Authorization: Bearer {token}```
+
+Разлогиниваем и удаляем пользователя
+
+---
+- POST /tag
+  
+  HEADER: ```Authorization: Bearer {token}```
+
+```json
+{
+  "name": "example",
+  "sortOrder": "0"
+}
+```
+
+**sortOrder** опционально по default 0
+Проверять на дублирование __name__ в базе и максимальную длину
+
+RETURN :
+
+```json
+{
+  "id": "id",
+  "name": "example",
+  "sortOrder": "0"
+}
+```
+
+---
+- GET /tag/{id}
+
+  HEADER: ```Authorization: Bearer {token}```
+
+
+RETURN :
+```json
+{
+  "creator": {
+    "nickname": "example",
+    "uid": "exam-pl-eUID"
+  },
+  "name": "example",
+  "sortOrder": "0"
+}
+```
+
+
+---
+- GET /tag?sortByOrder&sortByName&offset=10&length=10
+
+  HEADER: ```Authorization: Bearer {token}```
+
+**sortByOrder**, **offset** **SortByName**, **length** опциональны
+
+**length** количество элементов в выборке
+
+Если выбрали подход с страницами, то ипсользуйте параметры **page** и **pageSize** вместо **offset** и **length**
+
+RETURN :
+
+```json
+{
+  "data": [
+    {
+      "creator": {
+        "nickname": "example",
+        "uid": "exam-pl-eUID"
+      },
+      "name": "example",
+      "sortOrder": "0"
+    },
+    {
+      "creator": {
+        "nickname": "example",
+        "uid": "exam-pl-eUID"
+      },
+      "name": "example",
+      "sortOrder": "0"
+    }
+  ],
+  "meta": {
+    "offset": 10,
+    "length": 10,
+    "quantity": 100
+  }
+}
+```
+
+**quantity** общее количество элементов в выборке
+
+---
+- PUT /tag/{id}
+
+  HEADER: ```Authorization: Bearer {token}```
+
+Тэг может менять только владелец
+
+```json
+{
+  "name": "example",
+  "sortOrder": "0"
+}
+```
+
+**name** или **sortOrder** опциональны
+
+RETURN :
+```json
+{
+  "creator": {
+    "nickname": "example",
+    "uid": "exam-pl-eUID"
+  },
+  "name": "example",
+  "sortOrder": "0"
+}
+```
+
+---
+
+- DELETE /tag/{id}
+
+HEADER: ```Authorization: Bearer {token}```
+
+
+Тэг может удалить только владелец
+
+Каскадом удалем все связанные записи с этим Тэгом
+
+
+---
+
+---
+- POST /user/tag
+
+  HEADER: ```Authorization: Bearer {token}```
+
+```json
+{
+  "tags": [1, 2]
+}
+```
+
+Проверяем тэги на наличие в базе и добавляем к пользователю пачкой (атомарной операцией)
+
+Пример: Если тэга с id 2 нет в базе то и тэг с id 1 не добавится пользователю
+
+RETURN :
+
+```json
+{
+  "tags": [
+    {
+      "id": 1,
+      "name": "example",
+      "sortOrder": "0"
+    },
+    {
+      "id": 2,
+      "name": "example",
+      "sortOrder": "0"
+    },
+    {
+      "id": 3,
+      "name": "example",
+      "sortOrder": "0"
+    }
+  ]
+}
+```
+
+---
+- DELETE /user/tag/{id}
+
+  HEADER: ```Authorization: Bearer {token}```
+
+RETURN :
+
+```json
+{
+  "tags": [
+    {
+      "id": 1,
+      "name": "example",
+      "sortOrder": "0"
+    },
+    {
+      "id": 2,
+      "name": "example",
+      "sortOrder": "0"
+    },
+    {
+      "id": 3,
+      "name": "example",
+      "sortOrder": "0"
+    }
+  ]
+}
+```
+
+---
+- GET /user/tag/my
+
+  HEADER: ```Authorization: Bearer {token}```
+
+Отдаем список тэгов в которых пользователь является создателем
+
+RETURN :
+
+```json
+{
+  "tags": [
+    {
+      "id": 1,
+      "name": "example",
+      "sortOrder": "0"
+    },
+    {
+      "id": 2,
+      "name": "example",
+      "sortOrder": "0"
+    },
+    {
+      "id": 3,
+      "name": "example",
+      "sortOrder": "0"
+    }
+  ]
+}
