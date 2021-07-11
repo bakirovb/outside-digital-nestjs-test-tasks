@@ -12,15 +12,15 @@ services:
     volumes:
       - .:/usr/src/app
     environment:
-      POSTGRES_HOST: my_postgres
+      POSTGRES_HOST: mpostgres
       POSTGRES_PORT: 5432
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: postgres
-    command: npm run start:prod
+    command: npm run start
 
   postgres:
-    container_name: my_postgres
+    container_name: mpostgres
     image: postgres:latest
     restart: always
     volumes:
