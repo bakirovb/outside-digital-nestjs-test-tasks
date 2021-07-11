@@ -47,8 +47,23 @@ export class TagsController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('')
-  async getTags(@Query() { offset, length }) {
-    const { data, meta } = await this.tagsService.getTags(offset, length);
+  async getTags(@Query() { offset, length, sortByOrder, sortByName }) {
+    if (typeof sortByOrder === 'undefined') {
+      sortByOrder = false;
+    } else {
+      sortByOrder = true;
+    }
+    if (typeof sortByName === 'undefined') {
+      sortByName = false;
+    } else {
+      sortByName = true;
+    }
+    const { data, meta } = await this.tagsService.getTags(
+      offset,
+      length,
+      sortByOrder,
+      sortByName,
+    );
     return new paginatedDto<TagWithCreatorDto>({ data, meta });
   }
 

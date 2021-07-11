@@ -29,7 +29,7 @@ export class User {
   @OneToMany(() => RefreshSession, (refreshSession) => refreshSession.user)
   refreshSessions: RefreshSession[];
 
-  @ManyToMany(() => Tag)
+  @ManyToMany(() => Tag, { cascade: true })
   @JoinTable()
   tags: Tag[];
 }

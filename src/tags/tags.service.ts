@@ -5,7 +5,7 @@ import { PostgresErrorCode } from 'src/database/postgresErrorCode.enum';
 import { UserDto } from 'src/users/dto/user.dto';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { TagWithCreatorDto } from './dto/tag-wtih-creator.dto';
 import { TagDto } from './dto/tag.dto';
@@ -56,12 +56,20 @@ export class TagsService {
     offset = 0,
     length = 10,
     sortByOrder?: boolean,
-    SortByName?: boolean,
+    sortByName?: boolean,
   ) {
+    const order: FindManyOptions<Tag>['order'] = {};
+    if (sortByName === true) {
+      order.name = 'ASC';
+    }
+    if (sortByOrder === true) {
+      order.sortOrder = 'ASC';
+    }
     const [tags, count] = await this.tagsRepository.findAndCount({
       relations: ['creator'],
       skip: offset,
       take: length,
+      order,
     });
     return {
       data: tags.map((tag) => toTagWithCreatorDto(tag)),
