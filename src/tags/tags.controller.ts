@@ -16,8 +16,11 @@ import { TagsService } from './tags.service';
 import RequestWithUser from 'src/auth/interfaces/request-with-user.interface';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { GetTagParams } from './utils/get-tag-params';
-import { responseTags } from './dto/response-tags';
+import { ApiTags } from '@nestjs/swagger';
+import { paginatedDto } from 'src/common/dto/paginated.dto';
+import { TagWithCreatorDto } from './dto/tag-wtih-creator.dto';
 
+@ApiTags('tag')
 @UseGuards(JwtAuthGuard)
 @Controller('tag')
 export class TagsController {
@@ -46,7 +49,7 @@ export class TagsController {
   @Get('')
   async getTags(@Query() { offset, length }) {
     const { data, meta } = await this.tagsService.getTags(offset, length);
-    return new responseTags({ data, meta });
+    return new paginatedDto<TagWithCreatorDto>({ data, meta });
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

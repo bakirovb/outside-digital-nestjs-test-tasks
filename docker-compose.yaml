@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    volumes:
+      - .:/usr/src/app
+    environment:
+      POSTGRES_HOST: my_postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: postgres
+    command: npm run start:prod
+
+  postgres:
+    container_name: my_postgres
+    image: postgres:latest
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgres/data
+    environment:
+      POSTGRES_PASSWORD: secret
+
+volumes:
+  db-data:

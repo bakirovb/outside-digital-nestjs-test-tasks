@@ -9,10 +9,12 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import RequestWithUser from 'src/auth/interfaces/request-with-user.interface';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { UserTagService } from './user-tag.servise';
+import { UserTagService } from './user-tag.service';
 
+@ApiTags('user-tag')
 @UseGuards(JwtAuthGuard)
 @Controller('user/tag')
 export class UserTagController {

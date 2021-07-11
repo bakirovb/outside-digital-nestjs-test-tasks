@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { TagsModule } from 'src/tags/tags.module';
 import { UserTagController } from './user-tag.controller';
-import { UserTagService } from './user-tag.servise';
+import { UserTagService } from './user-tag.service';
 import { User } from './user.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';

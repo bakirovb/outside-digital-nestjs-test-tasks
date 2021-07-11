@@ -84,7 +84,7 @@ export class AuthService {
     return this.createTokens(payload);
   }
 
-  async createTokens(payload: JwtPayload) {
+  async createTokens(payload: JwtPayload): Promise<LoginStatus> {
     const refreshSessionData = {
       user: payload.sub,
       expiresIn: refreshSessionConstants.expiresIn,
